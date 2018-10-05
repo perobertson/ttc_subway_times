@@ -31,6 +31,7 @@ setup(
     version='0.3',
     description="Script to pull data from the TTC's Subway API and store them in a database",
     long_description=long_description,
+    url='https://github.com/CivicTechTO/ttc_subway_times',
     packages=find_packages(),
     install_requires=requires,
     setup_requires=setup_requires + pytest_runner,
@@ -40,5 +41,8 @@ setup(
     entry_points='''
         [console_scripts]
         ttc_api_scraper=ttc_api_scraper:main
-        '''
+        ''',
+    data_files=[
+        ('.', ['requirements.txt', 'requirements.test.txt']),
+    ],
 )
