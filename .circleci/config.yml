@@ -10,5 +10,13 @@ jobs:
       - checkout
 
       - run:
+          name: Install dependencies
+          command: |
+            export PATH="$HOME/.local/bin:$PATH"
+            pip install --user tox
+
+      - run:
           name: linters
-          command: tox -e linters
+          command: |
+            export PATH="$HOME/.local/bin:$PATH"
+            tox -e linters
