@@ -1,25 +1,27 @@
 version: 2
+commands:
+  install_deps:
+    steps:
+      - run: pip install --user tox
+
 jobs:
   linters:
     docker:
-      - image: python:3.6.6-slim
-
+      - image: python:3.6-slim
     working_directory: ~/repo
-
     steps:
       - checkout
+      - install_deps
+      - run: tox -e linters
 
-      - run:
-          name: Install dependencies
-          command: |
-            export PATH="$HOME/.local/bin:$PATH"
-            pip install --user tox
-
-      - run:
-          name: linters
-          command: |
-            export PATH="$HOME/.local/bin:$PATH"
-            tox -e linters
+  py33:
+    docker:
+      - image: python:3.3-slim
+    working_directory: ~/repo
+    steps:
+      - checkout
+      - install_deps
+      - run: tox -e py33
 
 
 workflows:
@@ -27,7 +29,7 @@ workflows:
   workflow:
     jobs:
       - linters
-      # - py33
+      - py33
       # - py34
       # - py35
       # - py36
