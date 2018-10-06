@@ -78,7 +78,8 @@ class DBArchiver (object):
 
     @staticmethod
     def validate_yyyymm_range(yyyymmrange):
-        """Validate the two yyyymm command line arguments provided
+        """Validate the two yyyymm command line arguments provided.
+
         Args:
             yyyymmrange: List containing a start and end year-month in yyyymm format
 
@@ -88,7 +89,6 @@ class DBArchiver (object):
         Raises:
             ValueError: If the values entered are incorrect
         """
-
         step = 1
 
         if len(yyyymmrange) != 2:
@@ -372,10 +372,10 @@ class TTCSubwayScraper(object):
 @click.pass_context
 def cli(ctx, settings='db.cfg'):
     import configparser
-    CONFIG = configparser.ConfigParser(interpolation=None)
-    CONFIG.read(settings)
-    dbset = CONFIG['DBSETTINGS']
-    log_settings = CONFIG['LOGGING']
+    config = configparser.ConfigParser(interpolation=None)
+    config.read(settings)
+    dbset = config['DBSETTINGS']
+    log_settings = config['LOGGING']
     ctx.obj['dbset'] = dbset
     logging.basicConfig(level=logging.getLevelName(log_settings['level']), format=log_settings['format'], filename=log_settings['filename'])
 
