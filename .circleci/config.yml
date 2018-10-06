@@ -1,8 +1,8 @@
 version: 2
 jobs:
-  build:
+  linters:
     docker:
-      - image: circleci/python:3.6.6
+      - image: python:3.6.6-slim
 
     working_directory: ~/repo
 
@@ -20,3 +20,15 @@ jobs:
           command: |
             export PATH="$HOME/.local/bin:$PATH"
             tox -e linters
+
+
+workflows:
+  version: 2
+  workflow:
+    jobs:
+      - linters
+      # - py33
+      # - py34
+      # - py35
+      # - py36
+      # - py37
