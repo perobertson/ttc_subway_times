@@ -20,13 +20,37 @@ jobs:
       - tox:
           env: linters
 
-  py33:
+  py34:
     docker:
-      - image: python:3.3-slim
+      - image: python:3.4-slim
     working_directory: ~/repo
     steps:
       - tox:
-          env: py33
+          env: py34
+
+  py35:
+    docker:
+      - image: python:3.5-slim
+    working_directory: ~/repo
+    steps:
+      - tox:
+          env: py35
+
+  py36:
+    docker:
+      - image: python:3.6-slim
+    working_directory: ~/repo
+    steps:
+      - tox:
+          env: py36
+
+  py37:
+    docker:
+      - image: python:3.7-slim
+    working_directory: ~/repo
+    steps:
+      - tox:
+          env: py37
 
 
 workflows:
@@ -34,8 +58,7 @@ workflows:
   workflow:
     jobs:
       - linters
-      - py33
-      # - py34
-      # - py35
-      # - py36
-      # - py37
+      - py34
+      - py35
+      - py36
+      - py37
