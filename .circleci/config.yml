@@ -7,9 +7,9 @@ commands:
     steps:
       - checkout
       - run: |
-        export PATH="$HOME/.local/bin:$PATH"
-        pip install --user tox
-        tox -e << parameters.env >>
+          export PATH="$HOME/.local/bin:$PATH"
+          pip install --user tox
+          tox -e << parameters.env >>
 
 jobs:
   linters:
