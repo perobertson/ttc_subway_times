@@ -48,11 +48,11 @@ class DBArchiver (object):
         self.con = con
 
     def compress(self, filename):
-        '''Compress the given filename'''
+        """Compress the given filename."""
         subprocess.run(['gzip', filename])
 
     def pull_data_to_csv(self, table, month):
-        '''Download data for the specified month and table to a csv'''
+        """Download data for the specified month and table to a csv."""
         query = self.SQLS[table].format(sql.Literal(month), sql.Literal(month))
         filename = table + '_' + month + '.csv'
         with self.con:
@@ -61,7 +61,7 @@ class DBArchiver (object):
                     cur.copy_expert(query, f)
 
     def archive_month(self, month):
-        '''Pull and comrpess the given month of data for all tables'''
+        """Pull and comrpess the given month of data for all tables."""
         for table in self.SQLS.keys():
             LOGGER.info('Pulling data for table: %s', table)
             self.pull_data_to_csv(table, month)
@@ -406,7 +406,7 @@ def _connection(ctx, retries=3, delay=3):
 @click.option('--filtering/--no-filtering', default=False)
 @click.option('-s', '--schemaname', default='public')
 def scrape(ctx, filtering, schemaname):
-    '''Run the scraper'''
+    """Run the scraper."""
     con = _connection(ctx)
     try:
         scraper = TTCSubwayScraper(LOGGER, con, filtering, schemaname)
@@ -423,7 +423,7 @@ def scrape(ctx, filtering, schemaname):
 @click.argument('month')
 @click.argument('end_month', required=False)
 def archive(ctx, month, end_month):
-    '''Download month (YYYYMM) of data from database and compress it'''
+    """Download month (YYYYMM) of data from database and compress it."""
     con = _connection(ctx)
     try:
         archive = DBArchiver(con)
