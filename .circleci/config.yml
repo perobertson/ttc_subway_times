@@ -1,8 +1,15 @@
 version: 2.1
 commands:
-  install_deps:
+  tox:
+    parameters:
+      env:
+        type: string
     steps:
-      - run: pip install --user tox
+      - checkout
+      - run: |
+        export PATH="$HOME/.local/bin:$PATH"
+        pip install --user tox
+        tox -e << parameters.env >>
 
 jobs:
   linters:
@@ -10,18 +17,16 @@ jobs:
       - image: python:3.6-slim
     working_directory: ~/repo
     steps:
-      - checkout
-      - install_deps
-      - run: tox -e linters
+      - tox:
+          env: linters
 
   py33:
     docker:
       - image: python:3.3-slim
     working_directory: ~/repo
     steps:
-      - checkout
-      - install_deps
-      - run: tox -e py33
+      - tox:
+          env: py33
 
 
 workflows:
