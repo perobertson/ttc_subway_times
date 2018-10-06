@@ -41,6 +41,8 @@ jobs:
       - image: python:3.7-slim
     working_directory: ~/repo
     steps:
+      - run: apt-get update
+      - run: apt-get install -y build-essential
       - tox:
           env: py37
 
