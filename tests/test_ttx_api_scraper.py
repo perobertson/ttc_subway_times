@@ -1,3 +1,5 @@
+from __future__ import generator_stop
+
 from click.testing import CliRunner
 
 from ttc_api_scraper import cli

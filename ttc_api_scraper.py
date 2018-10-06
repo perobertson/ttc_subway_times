@@ -1,3 +1,5 @@
+from __future__ import generator_stop
+
 import asyncio
 import logging
 import logging.config
@@ -6,11 +8,10 @@ import subprocess
 from datetime import datetime
 from time import sleep
 
-import click
-from psycopg2 import connect, OperationalError, sql  # Connect to local PostgreSQL db
-
 import aiohttp  # this lib replaces requests for asynchronous i/o
+import click
 import requests  # to handle http requests to the API
+from psycopg2 import OperationalError, connect, sql  # Connect to local PostgreSQL db
 
 # import socket
 

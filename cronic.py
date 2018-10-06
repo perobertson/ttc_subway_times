@@ -1,4 +1,5 @@
-# dumb looping script for those who do not love cron
+"""dumb looping script for those who do not love cron."""
+from __future__ import generator_stop
 
 import subprocess
 from datetime import datetime
