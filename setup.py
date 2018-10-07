@@ -1,9 +1,12 @@
+"""Packaging logic for ttc_api_scraper."""
+from __future__ import generator_stop
+
 import sys
 
 from setuptools import find_packages, setup
 
 
-def req_reader(filename):
+def _req_reader(filename):
     with open(filename) as f:
         return [
             requirement
@@ -15,8 +18,8 @@ def req_reader(filename):
 with open('README.md', 'r') as f:
     long_description = f.read()
 
-requires = req_reader('requirements.txt')
-tests_require = req_reader('requirements.test.txt')
+requires = _req_reader('requirements.txt')
+tests_require = _req_reader('requirements.test.txt')
 setup_requires = []
 extras_require = {
     'test': tests_require,
@@ -37,7 +40,7 @@ setup(
     setup_requires=setup_requires + pytest_runner,
     tests_require=tests_require,
     extras_require=extras_require,
-    python_requires='>=3,<3.7.0',
+    python_requires='~=3.5',
     entry_points='''
         [console_scripts]
         ttc_api_scraper=ttc_api_scraper:main
