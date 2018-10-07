@@ -154,7 +154,7 @@ class TTCSubwayScraper(object):
                         VALUES(%s)
                         RETURNING pollid""".format(schema=schema)
 
-    def get_API_response(self, line_id, station_id):
+    def get_api_response(self, line_id, station_id):
         payload = {"subwayLine": line_id,
                    "stationId": station_id,
                    "searchCriteria": ''}
@@ -234,8 +234,8 @@ class TTCSubwayScraper(object):
     def check_for_missing_data(self, stationid, lineid, data):
         if data is None:
             return True
-        ntasData = data.get('ntasData')
-        if ntasData is None or ntasData == []:
+        ntas_data = data.get('ntasData')
+        if ntas_data is None or ntas_data == []:
             return True
 
         # there is data, so do more careful checks
@@ -248,7 +248,7 @@ class TTCSubwayScraper(object):
         # most general way to detect the problem is to check subwayLine field
         linecodes = ("YUS", "BD", "", "SHEP")
         # look for one train observed in the right direction
-        for record in ntasData:
+        for record in ntas_data:
             if record['subwayLine'] == linecodes[lineid - 1]:
                 return False
 
@@ -347,7 +347,7 @@ class TTCSubwayScraper(object):
         for line_id, stations in self.LINES.items():
             for station_id in stations:
                 for attempt in range(retries):
-                    data = self.get_API_response(line_id, station_id)
+                    data = self.get_api_response(line_id, station_id)
                     if not self.check_for_missing_data(station_id, line_id, data):
                         break
                     else:
