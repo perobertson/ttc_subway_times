@@ -1,8 +1,6 @@
 [paths]
 source =
-  cronic.py
-  ttc_api_scraper.py
-  ttc_api_scraper/
+  src/
 
 [report]
 precision = 2
@@ -10,6 +8,4 @@ precision = 2
 [run]
 branch = True
 source =
-  cronic.py
-  ttc_api_scraper.py
-  ttc_api_scraper/
+  src/
