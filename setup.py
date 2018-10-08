@@ -44,7 +44,7 @@ setup(
     python_requires='~=3.5',
     entry_points='''
         [console_scripts]
-        ttc_api_scraper=ttc_api_scraper:main
+        ttc_api_scraper=ttc_api_scraper.__init__:main
         ''',
     data_files=[
         ('.', ['requirements.txt', 'requirements.test.txt']),
