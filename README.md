@@ -86,37 +86,57 @@ user=yourusername
 password=pw
 ```
 
-
 ### Automating the scraper runs
+First you need to install the scraper on the machine that you want to run it on. This is done with `python setup.py install`. You can append `--help` to find more install options and configuration. This will install the scraper along with its dependencies needed to run. To uninstall it you can use `pip uninstall ttc-api-scraper`.
 
-The scraper runs with a `python ttc_scraper_api.py` command. It doesn't have any command line options (at the moment). We've been running this from 6AM to 1AM
+Once installed you will be able to run the scraper directly from the terminal with `ttc_api_scraper`. If you get a `command not found` error, you will need to make sure that the python binaries are on your `PATH`. When the install command ran, it would have printed a line like `Installing ttc_api_scraper script to ~/.pyenv/versions/3.6.6/bin`. This is the location that needs to be added to your `PATH`.
+
+Alternatively, you can install the required dependencies with `pip install -r requirements.txt` and then run `python src/ttc_api_scraper/__init__.py`
+
+Try appending `--help` to the script to see the current commands and options that are supported.
+
+<details><summary>Current commands and options</summary>
+```
+Usage: ttc_api_scraper [OPTIONS] COMMAND [ARGS]...
+
+Options:
+  -d, --settings PATH
+  --help               Show this message and exit.
+
+Commands:
+  archive  Download month (YYYYMM) of data from database...
+  scrape   Run the scraper.
+```
+</details>
+
+We've been running this from 6AM to 1AM.
 
 #### Linux/Unix
 If you use Mac or Linux, add the below to cron. Don't forget to change `/path/to/ttc_api_scraper.py`
 
 ```shell
 # m h  dom mon dow   command
-* 5-23 * * 1-5 cd /path/to/repo/ttc_subway_times/ && bin/python3 ttc_api_scraper.py
-* 0-1 * * 1-5 cd /path/to/repo/ttc_subway_times/ && bin/python3 ttc_api_scraper.py
-* 5-23 * * 6-7 cd /path/to/repo/ttc_subway_times/ && bin/python3 ttc_api_scraper.py
-* 0-2 * * 6-7 cd /path/to/repo/ttc_subway_times/ && bin/python3 ttc_api_scraper.py
+* 5-23 * * 1-5 cd /path/to/repo/ttc_subway_times/ && bin/python3 src/ttc_api_scraper/__init__.py scrape
+* 0-1 * * 1-5 cd /path/to/repo/ttc_subway_times/ && bin/python3 src/ttc_api_scraper/__init__.py scrape
+* 5-23 * * 6-7 cd /path/to/repo/ttc_subway_times/ && bin/python3 src/ttc_api_scraper/__init__.py scrape
+* 0-2 * * 6-7 cd /path/to/repo/ttc_subway_times/ && bin/python3 src/ttc_api_scraper/__init__.py scrape
 ```
 Or if you want to run every 20s while filtering out any "arriving" records
 
 ```shell
 
-* 5-23 * * 1-5 cd ~/git/ttc_subway_times && bin/python3 ttc_api_scraper.py --filter --schemaname filtered
-* 0-1 * * 1-5 cd ~/git/ttc_subway_times && bin/python3 ttc_api_scraper.py --filter --schemaname filtered
-* 5-23 * * 6-7 cd ~/git/ttc_subway_times && bin/python3 ttc_api_scraper.py --filter --schemaname filtered
-* 0-2 * * 6-7 cd ~/git/ttc_subway_times && bin/python3 ttc_api_scraper.py --filter --schemaname filtered
-* 5-23 * * 1-5 (sleep 20; cd ~/git/ttc_subway_times && bin/python3 ttc_api_scraper.py --filter --schemaname filtered)
-* 0-1 * * 1-5 (sleep 20; cd ~/git/ttc_subway_times && bin/python3 ttc_api_scraper.py --filter --schemaname filtered)
-* 5-23 * * 6-7 (sleep 20; cd ~/git/ttc_subway_times && bin/python3 ttc_api_scraper.py --filter --schemaname filtered)
-* 0-2 * * 6-7 (sleep 20; cd ~/git/ttc_subway_times && bin/python3 ttc_api_scraper.py --filter --schemaname filtered)
-* 5-23 * * 1-5 (sleep 40; cd ~/git/ttc_subway_times && bin/python3 ttc_api_scraper.py --filter --schemaname filtered)
-* 0-1 * * 1-5 (sleep 40; cd ~/git/ttc_subway_times && bin/python3 ttc_api_scraper.py --filter --schemaname filtered)
-* 5-23 * * 6-7 (sleep 40; cd ~/git/ttc_subway_times && bin/python3 ttc_api_scraper.py --filter --schemaname filtered)
-* 0-2 * * 6-7 (sleep 40; cd ~/git/ttc_subway_times && bin/python3 ttc_api_scraper.py --filter --schemaname filtered)
+* 5-23 * * 1-5 cd ~/git/ttc_subway_times && bin/python3 src/ttc_api_scraper/__init__.py scrape --filter --schemaname filtered
+* 0-1 * * 1-5 cd ~/git/ttc_subway_times && bin/python3 src/ttc_api_scraper/__init__.py scrape --filter --schemaname filtered
+* 5-23 * * 6-7 cd ~/git/ttc_subway_times && bin/python3 src/ttc_api_scraper/__init__.py scrape --filter --schemaname filtered
+* 0-2 * * 6-7 cd ~/git/ttc_subway_times && bin/python3 src/ttc_api_scraper/__init__.py scrape --filter --schemaname filtered
+* 5-23 * * 1-5 (sleep 20; cd ~/git/ttc_subway_times && bin/python3 src/ttc_api_scraper/__init__.py scrape --filter --schemaname filtered)
+* 0-1 * * 1-5 (sleep 20; cd ~/git/ttc_subway_times && bin/python3 src/ttc_api_scraper/__init__.py scrape --filter --schemaname filtered)
+* 5-23 * * 6-7 (sleep 20; cd ~/git/ttc_subway_times && bin/python3 src/ttc_api_scraper/__init__.py scrape --filter --schemaname filtered)
+* 0-2 * * 6-7 (sleep 20; cd ~/git/ttc_subway_times && bin/python3 src/ttc_api_scraper/__init__.py scrape --filter --schemaname filtered)
+* 5-23 * * 1-5 (sleep 40; cd ~/git/ttc_subway_times && bin/python3 src/ttc_api_scraper/__init__.py scrape --filter --schemaname filtered)
+* 0-1 * * 1-5 (sleep 40; cd ~/git/ttc_subway_times && bin/python3 src/ttc_api_scraper/__init__.py scrape --filter --schemaname filtered)
+* 5-23 * * 6-7 (sleep 40; cd ~/git/ttc_subway_times && bin/python3 src/ttc_api_scraper/__init__.py scrape --filter --schemaname filtered)
+* 0-2 * * 6-7 (sleep 40; cd ~/git/ttc_subway_times && bin/python3 src/ttc_api_scraper/__init__.py scrape --filter --schemaname filtered)
 ```
 
 #### Windows users
