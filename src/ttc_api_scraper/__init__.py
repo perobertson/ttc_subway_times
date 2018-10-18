@@ -59,7 +59,7 @@ class DBArchiver (object):
     def pull_data_to_csv(self, table, month):
         '''Download data for the specified month and table to a csv'''
         query = self.SQLS[table].format(sql.Literal(month), sql.Literal(month))
-        filename = table + '_' + month + '.csv'
+        filename = table+'_'+month+'.csv'
         with self.con:
             with self.con.cursor() as cur:
                 with open(filename, 'w') as f:
@@ -82,7 +82,7 @@ class DBArchiver (object):
 
     @staticmethod
     def validate_yyyymm_range(yyyymmrange):
-        """Validate the two yyyymm command line arguments provided.
+        """Validate the two yyyymm command line arguments provided
 
         Args:
             yyyymmrange: List containing a start and end year-month in yyyymm format
@@ -97,7 +97,7 @@ class DBArchiver (object):
 
         if len(yyyymmrange) != 2:
             raise ValueError('{yyyymmrange} should contain two YYYYMM arguments'
-                             .format(yyyymmrange=yyyymmrange))
+                            .format(yyyymmrange=yyyymmrange))
 
         regex_yyyymm = re.compile(r'20\d\d(0[1-9]|1[0-2])')
         yyyy, mm = [], []
@@ -109,34 +109,33 @@ class DBArchiver (object):
                 mm.append(int(yyyymm[-2:]))
             else:
                 raise ValueError('{yyyymm} is not a valid year-month value of format YYYYMM'
-                                 .format(yyyymm=yyyymm))
+                                .format(yyyymm=yyyymm))
 
         if yyyy[0] > yyyy[1] or (yyyy[0] == yyyy[1] and mm[0] > mm[1]):
             raise ValueError('Start date {yyyymm1} after end date {yyyymm2}'
-                             .format(yyyymm1=yyyymmrange[0], yyyymm2=yyyymmrange[1]))
+                            .format(yyyymm1=yyyymmrange[0], yyyymm2=yyyymmrange[1]))
 
-        # Iterate over years and months
+        #Iterate over years and months
         if yyyy[0] == yyyy[1]:
-            years[yyyy[0]] = range(mm[0], mm[1] + 1, step)
+            years[yyyy[0]] = range(mm[0], mm[1]+1, step)
         else:
-            for year in range(yyyy[0], yyyy[1] + 1):
+            for year in range(yyyy[0], yyyy[1]+1):
                 if year == yyyy[0]:
                     years[year] = range(mm[0], 13, step)
                 elif year == yyyy[1]:
-                    years[year] = range(1, mm[1] + 1, step)
+                    years[year] = range(1, mm[1]+1, step)
                 else:
                     years[year] = range(1, 13, step)
         return years
 
-
-class TTCSubwayScraper(object):
+class TTCSubwayScraper( object ):
     LINES = {1: list(range(1, 33)) + list(range(75, 81)),  # max value must be 1 greater
                                                            # Line 1 extension is 75-80
              2: range(33, 64),
              4: range(64, 69)}
     BASE_URL = "http://www.ttc.ca/Subway/loadNtas.action"
-    INTERCHANGES = (9, 10, 22, 30, 47, 48, 50, 64)
-    # BASE_URL = 'http://www.ttc.ca/Subway/'
+    INTERCHANGES = (9,10,22,30,47,48,50,64)
+    #BASE_URL = 'http://www.ttc.ca/Subway/'
 
     def __init__(self, logger, con, filter_flag, schema):
         self.logger = logger
@@ -154,11 +153,11 @@ class TTCSubwayScraper(object):
                        RETURNING requestid""".format(schema=schema)
         self.poll_update_sql = """UPDATE {schema}.polls set poll_end = %s
                         WHERE pollid = %s""".format(schema=schema)
-        self.poll_insert_sql = """INSERT INTO {schema}.polls(poll_start)
+        self.poll_insert_sql =  """INSERT INTO {schema}.polls(poll_start)
                         VALUES(%s)
                         RETURNING pollid""".format(schema=schema)
 
-    def get_api_response(self, line_id, station_id):
+    def get_API_response(self, line_id, station_id):
         payload = {"subwayLine": line_id,
                    "stationId": station_id,
                    "searchCriteria": ''}
@@ -351,7 +350,7 @@ class TTCSubwayScraper(object):
         for line_id, stations in self.LINES.items():
             for station_id in stations:
                 for attempt in range(retries):
-                    data = self.get_api_response(line_id, station_id)
+                    data = self.get_API_response(line_id, station_id)
                     if not self.check_for_missing_data(station_id, line_id, data):
                         break
                     else:
