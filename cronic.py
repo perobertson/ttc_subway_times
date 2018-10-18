@@ -1,16 +1,13 @@
-"""dumb looping script for those who do not love cron."""
-from __future__ import generator_stop
+# dumb looping script for those who do not love cron
 
+from time import sleep
 import subprocess
 from datetime import datetime
-from time import sleep
-
 
 def run_parallel():
     while True:
         subprocess.Popen("python src/ttc_api_scraper/__init__.py scrape", shell=True)
         sleep(10)
-
 
 def run_blocking():
     period = 10
@@ -24,7 +21,7 @@ def run_blocking():
 
         subprocess.run("python src/ttc_api_scraper/__init__.py scrape", shell=True)
         et = datetime.now()
-        delta = et - st
+        delta = et-st
         if(delta.seconds < period):
             sleep(period - delta.seconds)
 
@@ -32,7 +29,6 @@ def run_blocking():
 def main():
     # run_parallel()
     run_blocking()
-
 
 if __name__ == "__main__":
     main()
