@@ -1,19 +1,20 @@
-from __future__ import generator_stop
-
 import asyncio
 import logging
 import logging.config
 import re
 import subprocess
+import sys
 from datetime import datetime
 from time import sleep
 
-import aiohttp  # this lib replaces requests for asynchronous i/o
 import click
-import requests  # to handle http requests to the API
 from psycopg2 import OperationalError, connect, sql  # Connect to local PostgreSQL db
 
-# import socket
+import aiohttp  # this lib replaces requests for asynchronous i/o
+import async_timeout
+import requests  # to handle http requests to the API
+
+#import socket
 
 # Note - the package yarl, a dependency of aiohttp, breaks the library on version 0.9.4 and 0.9.5
 # So need to manually install 0.9.3 or try 0.9.6, which should fix the bug.
@@ -23,6 +24,10 @@ from psycopg2 import OperationalError, connect, sql  # Connect to local PostgreS
 
 # optimal performance may require installation of cchardet and aiodns packages
 # see  http://aiohttp.readthedocs.io/en/stable/index.html
+
+#Not used anymore
+class MissingDataException( TypeError):
+    pass
 
 LOGGER = logging.getLogger(__name__)
 
