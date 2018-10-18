@@ -361,11 +361,11 @@ class TTCSubwayScraper(object):
                         self.logger.debug("Sleeping 2s  ...")
                         sleep(2)
 
-                if self.check_for_missing_data(station_id, line_id, data):
+                if self.check_for_missing_data( station_id, line_id, data) :
                     errmsg = 'No data for line {line}, station {station}'
                     self.logger.error(errmsg.format(line=line_id, station=station_id))
                     continue
-                request_id = self.insert_request_info(poll_id, data, line_id, station_id, datetime.now())
+                request_id = self.insert_request_info(poll_id, data, line_id, station_id, datetime.now() )
                 self.insert_ntas_data(data['ntasData'], request_id)
 
         self.update_poll_end(poll_id, datetime.now())
@@ -376,10 +376,10 @@ class TTCSubwayScraper(object):
 @click.pass_context
 def cli(ctx, settings='db.cfg'):
     import configparser
-    config = configparser.ConfigParser(interpolation=None)
-    config.read(settings)
-    dbset = config['DBSETTINGS']
-    log_settings = config['LOGGING']
+    CONFIG = configparser.ConfigParser(interpolation=None)
+    CONFIG.read(settings)
+    dbset = CONFIG['DBSETTINGS']
+    log_settings = CONFIG['LOGGING']
     ctx.obj['dbset'] = dbset
     logging.basicConfig(level=logging.getLevelName(log_settings['level']), format=log_settings['format'], filename=log_settings['filename'])
 
@@ -409,9 +409,9 @@ def _connection(ctx, retries=3, delay=3):
 @cli.command()
 @click.pass_context
 @click.option('--filtering/--no-filtering', default=False)
-@click.option('-s', '--schemaname', default='public')
+@click.option('-s','--schemaname', default='public')
 def scrape(ctx, filtering, schemaname):
-    """Run the scraper."""
+    '''Run the scraper'''
     con = _connection(ctx)
     try:
         scraper = TTCSubwayScraper(LOGGER, con, filtering, schemaname)
@@ -428,7 +428,7 @@ def scrape(ctx, filtering, schemaname):
 @click.argument('month')
 @click.argument('end_month', required=False)
 def archive(ctx, month, end_month):
-    """Download month (YYYYMM) of data from database and compress it."""
+    '''Download month (YYYYMM) of data from database and compress it'''
     con = _connection(ctx)
     try:
         archive = DBArchiver(con)
@@ -447,7 +447,7 @@ def archive(ctx, month, end_month):
 
 
 def main():
-    # https://github.com/pallets/click/issues/456#issuecomment-159543498
+    #https://github.com/pallets/click/issues/456#issuecomment-159543498
     cli(obj={})
 
 

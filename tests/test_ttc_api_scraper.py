@@ -17,7 +17,7 @@ def test_help():
     for idx, line in enumerate(lines):
         if line == 'Commands:':
             assert '  archive  Download month (YYYYMM) of data from database...' == lines[idx + 1]
-            assert '  scrape   Run the scraper.' == lines[idx + 2]
+            assert '  scrape   Run the scraper' == lines[idx + 2]
             assert '' == lines[idx + 3]
             assert idx + 3 == len(lines) - 1
             break
