@@ -129,8 +129,8 @@ class DBArchiver (object):
         return years
 
 class TTCSubwayScraper( object ):
-    LINES = {1: list(range(1, 33)) + list(range(75, 81)),  #max value must be 1 greater
-                                                           #Line 1 extension is 75-80
+    LINES = {1: list(range(1, 33)) + list(range(75, 81)), #max value must be 1 greater
+                                                          #Line 1 extension is 75-80
              2: range(33, 64),
              4: range(64, 69)}
     BASE_URL = "http://www.ttc.ca/Subway/loadNtas.action"
@@ -201,7 +201,7 @@ class TTCSubwayScraper( object ):
 
         for record in ntas_data:
             if self.filter_flag and record['trainMessage'] == "Arriving":
-                continue  #skip any records that are Arriving or not final
+                continue #skip any records that are Arriving or not final
             record_row ={}
             record_row['requestid'] = request_id
             record_row['id'] = record['id']
@@ -261,8 +261,8 @@ class TTCSubwayScraper( object ):
     async def query_station_async(self, session, line_id, station_id):
         retries = 4
         payload = {"subwayLine":line_id,
-                   "stationId":station_id,
-                   "searchCriteria":''}
+                       "stationId":station_id,
+                       "searchCriteria":''}
         for attempt in range(retries):
             #with async_timeout.timeout(10):
             try:
@@ -279,6 +279,7 @@ class TTCSubwayScraper( object ):
                             self.logger.debug("Sleeping 2s  ...")
                             await asyncio.sleep(2)
                         continue
+
 
                     if self.check_for_missing_data(station_id, line_id, data):
                         self.logger.debug("Missing data!")
@@ -297,6 +298,7 @@ class TTCSubwayScraper( object ):
                     await asyncio.sleep(2)
                 continue
         return (None, None)
+
 
     # async def qtest( self, session, line_id, station_id):
     #     payload = {"subwayLine":line_id,
@@ -334,28 +336,30 @@ class TTCSubwayScraper( object ):
             # check results and insert into db
             for line_id, stations in self.LINES.items():
                 for station_id in stations:
-                    (data, rtime) = responses[station_id - 1]  # may want to tweak this to check error codes etc
-                    if self.check_for_missing_data(station_id, line_id, data):
+                    (data, rtime) = responses[station_id-1]  # may want to tweak this to check error codes etc
+                    if self.check_for_missing_data( station_id, line_id, data):
                         errmsg = 'No data for line {line}, station {station}'
-                        self.logger.error(errmsg.format(line=line_id, station=station_id))
+                        self.logger.error(errmsg.format(line=line_id, station=station_id) )
                         continue
                     request_id = self.insert_request_info(poll_id, data, line_id, station_id, rtime)
                     self.insert_ntas_data(data['ntasData'], request_id)
 
-            self.update_poll_end(poll_id, datetime.now())
+            self.update_poll_end( poll_id, datetime.now() )
+
+
 
     def query_all_stations(self):
-        poll_id = self.insert_poll_start(datetime.now())
+        poll_id = self.insert_poll_start( datetime.now() )
         retries = 3
         for line_id, stations in self.LINES.items():
             for station_id in stations:
                 for attempt in range(retries):
                     data = self.get_API_response(line_id, station_id)
-                    if not self.check_for_missing_data(station_id, line_id, data):
+                    if not self.check_for_missing_data( station_id, line_id, data ):
                         break
                     else:
                         self.logger.debug("Try " + str(attempt + 1) + " for station " + str(station_id) + " failed.")
-                        # if data is None:
+                        #if data is None:
                         # for http and timeout errors, sleep 2s before retrying
                         self.logger.debug("Sleeping 2s  ...")
                         sleep(2)
@@ -367,7 +371,7 @@ class TTCSubwayScraper( object ):
                 request_id = self.insert_request_info(poll_id, data, line_id, station_id, datetime.now() )
                 self.insert_ntas_data(data['ntasData'], request_id)
 
-        self.update_poll_end(poll_id, datetime.now())
+        self.update_poll_end( poll_id, datetime.now() )
 
 
 @click.group()
