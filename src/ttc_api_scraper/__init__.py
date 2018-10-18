@@ -337,11 +337,11 @@ class TTCSubwayScraper( object ):
             for line_id, stations in self.LINES.items():
                 for station_id in stations:
                     (data, rtime) = responses[station_id-1]  # may want to tweak this to check error codes etc
-                    if self.check_for_missing_data( station_id, line_id, data):
+                    if self.check_for_missing_data( station_id, line_id, data) :
                         errmsg = 'No data for line {line}, station {station}'
                         self.logger.error(errmsg.format(line=line_id, station=station_id) )
                         continue
-                    request_id = self.insert_request_info(poll_id, data, line_id, station_id, rtime)
+                    request_id = self.insert_request_info(poll_id, data, line_id, station_id, rtime )
                     self.insert_ntas_data(data['ntasData'], request_id)
 
             self.update_poll_end( poll_id, datetime.now() )
@@ -355,10 +355,10 @@ class TTCSubwayScraper( object ):
             for station_id in stations:
                 for attempt in range(retries):
                     data = self.get_API_response(line_id, station_id)
-                    if not self.check_for_missing_data( station_id, line_id, data ):
+                    if not self.check_for_missing_data( station_id, line_id, data) :
                         break
                     else:
-                        self.logger.debug("Try " + str(attempt + 1) + " for station " + str(station_id) + " failed.")
+                        self.logger.debug("Try " + str(attempt+1) + " for station " + str(station_id) + " failed.")
                         #if data is None:
                         # for http and timeout errors, sleep 2s before retrying
                         self.logger.debug("Sleeping 2s  ...")
