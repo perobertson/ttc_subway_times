@@ -33,15 +33,14 @@ LOGGER = logging.getLogger(__name__)
 
 class DBArchiver (object):
 
-    SQLS = {
-        'polls': sql.SQL('''COPY(SELECT * FROM public.polls
+    SQLS = {'polls': sql.SQL('''COPY(SELECT * FROM public.polls
                                  WHERE poll_start >= {0}::DATE AND poll_start < {1}::DATE + INTERVAL '1 month')
                             TO STDOUT WITH CSV HEADER'''),
-        'requests': sql.SQL('''COPY (SELECT r.* FROM public.requests r
+            'requests': sql.SQL('''COPY (SELECT r.* FROM public.requests r
                                      NATURAL JOIN public.polls
                                      WHERE poll_start >= {0}::DATE AND poll_start < {1}::DATE + INTERVAL '1 month')
                                TO STDOUT WITH CSV HEADER'''),
-        'ntas_data': sql.SQL('''COPY (SELECT n.* FROM public.ntas_data n
+            'ntas_data': sql.SQL('''COPY (SELECT n.* FROM public.ntas_data n
                                       NATURAL JOIN public.requests
                                       NATURAL JOIN public.polls
                                       WHERE poll_start >= {}::DATE AND poll_start < {}::DATE + INTERVAL '1 month')
@@ -201,7 +200,7 @@ class TTCSubwayScraper( object ):
 
         for record in ntas_data:
             if self.filter_flag and record['trainMessage'] == "Arriving":
-                continue #skip any records that are Arriving or not final
+                continue # skip any records that are Arriving or not final
             record_row ={}
             record_row['requestid'] = request_id
             record_row['id'] = record['id']
@@ -213,8 +212,8 @@ class TTCSubwayScraper( object ):
             record_row['trainid'] = record['trainId']
             record_row['train_message'] = record['trainMessage']
             record_row['train_dest'] = record['stationDirectionText']
-            cursor.execute(self.NTAS_SQL, record_row)
 
+            cursor.execute(self.NTAS_SQL, record_row)
         self.con.commit()
         cursor.close()
 
@@ -258,7 +257,7 @@ class TTCSubwayScraper( object ):
         # none match
         return True
 
-    async def query_station_async(self, session, line_id, station_id):
+    async def query_station_async(self, session, line_id, station_id ):
         retries = 4
         payload = {"subwayLine":line_id,
                        "stationId":station_id,
@@ -339,11 +338,10 @@ class TTCSubwayScraper( object ):
                     (data, rtime) = responses[station_id-1]  # may want to tweak this to check error codes etc
                     if self.check_for_missing_data( station_id, line_id, data) :
                         errmsg = 'No data for line {line}, station {station}'
-                        self.logger.error(errmsg.format(line=line_id, station=station_id) )
+                        self.logger.error(errmsg.format(line=line_id, station=station_id))
                         continue
                     request_id = self.insert_request_info(poll_id, data, line_id, station_id, rtime )
                     self.insert_ntas_data(data['ntasData'], request_id)
-
             self.update_poll_end( poll_id, datetime.now() )
 
 
