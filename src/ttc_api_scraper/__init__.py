@@ -39,7 +39,7 @@ class DBArchiver (object):
             'requests' : sql.SQL('''COPY (SELECT r.* FROM public.requests r
                                           NATURAL JOIN public.polls
                                           WHERE poll_start >= {0}::DATE AND poll_start < {1}::DATE + INTERVAL '1 month')
-                                    TO STDOUT WITH CSV HEADER'''),
+                                     TO STDOUT WITH CSV HEADER'''),
             'ntas_data' : sql.SQL('''COPY (SELECT n.* FROM public.ntas_data n
                                         NATURAL JOIN public.requests
                                         NATURAL JOIN public.polls
@@ -126,6 +126,7 @@ class DBArchiver (object):
                 else:
                     years[year] = range(1, 13, step)
         return years
+
 
 class TTCSubwayScraper( object ):
     LINES = {1: list(range(1, 33)) + list(range(75, 81)), #max value must be 1 greater
@@ -232,6 +233,7 @@ class TTCSubwayScraper( object ):
         self.con.commit()
         cursor.close()
         self.logger.debug("Poll " + str(poll_id) + " ended at " + str(time))
+
 
     def check_for_missing_data( self, stationid, lineid, data):
         if data is None:
