@@ -31,7 +31,6 @@ class MissingDataException( TypeError):
 
 LOGGER = logging.getLogger(__name__)
 
-
 class DBArchiver (object):
 
     SQLS = {
@@ -54,11 +53,11 @@ class DBArchiver (object):
         self.con = con
 
     def compress(self, filename):
-        """Compress the given filename."""
+        '''Compress the given filename'''
         subprocess.run(['gzip', filename])
 
     def pull_data_to_csv(self, table, month):
-        """Download data for the specified month and table to a csv."""
+        '''Download data for the specified month and table to a csv'''
         query = self.SQLS[table].format(sql.Literal(month), sql.Literal(month))
         filename = table + '_' + month + '.csv'
         with self.con:
@@ -67,19 +66,19 @@ class DBArchiver (object):
                     cur.copy_expert(query, f)
 
     def archive_month(self, month):
-        """Pull and comrpess the given month of data for all tables."""
+        '''Pull and comrpess the given month of data for all tables'''
         for table in self.SQLS.keys():
             LOGGER.info('Pulling data for table: %s', table)
             self.pull_data_to_csv(table, month)
             LOGGER.info('Compressing')
-            self.compress(table + '_' + month + '.csv')
+            self.compress(table+'_'+month+'.csv')
 
     @staticmethod
     def format_month(yyyy, mm):
-        dd = '01'
+        dd='01'
         if mm < 10:
-            return str(yyyy) + '-0' + str(mm) + '-' + dd
-        return str(yyyy) + '-' + str(mm) + '-' + dd
+            return str(yyyy)+'-0'+str(mm)+'-'+dd
+        return str(yyyy)+'-'+str(mm)+'-'+dd
 
     @staticmethod
     def validate_yyyymm_range(yyyymmrange):
