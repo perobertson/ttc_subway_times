@@ -232,7 +232,7 @@ class TTCSubwayScraper( object ):
         cursor.execute(self.poll_update_sql, (str(time), str(poll_id)) )
         self.con.commit()
         cursor.close()
-        self.logger.debug("Poll " + str(poll_id) + " ended at " + str(time))
+        self.logger.debug("Poll " + str(poll_id) + " ended at " + str(time) )
 
 
     def check_for_missing_data( self, stationid, lineid, data):
