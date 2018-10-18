@@ -129,8 +129,8 @@ class DBArchiver (object):
         return years
 
 class TTCSubwayScraper( object ):
-    LINES = {1: list(range(1, 33)) + list(range(75, 81)),  # max value must be 1 greater
-                                                           # Line 1 extension is 75-80
+    LINES = {1: list(range(1, 33)) + list(range(75, 81)),  #max value must be 1 greater
+                                                           #Line 1 extension is 75-80
              2: range(33, 64),
              4: range(64, 69)}
     BASE_URL = "http://www.ttc.ca/Subway/loadNtas.action"
@@ -158,13 +158,13 @@ class TTCSubwayScraper( object ):
                         RETURNING pollid""".format(schema=schema)
 
     def get_API_response(self, line_id, station_id):
-        payload = {"subwayLine": line_id,
-                   "stationId": station_id,
-                   "searchCriteria": ''}
+        payload = {"subwayLine":line_id,
+                   "stationId":station_id,
+                   "searchCriteria":''}
 
         # with timeout set to 10, need to use a try block here to catch timeout errors
         try:
-            r = requests.get(self.BASE_URL, params=payload, timeout=10)
+            r = requests.get(self.BASE_URL, params = payload, timeout = 10)
         except requests.exceptions.RequestException as err:
             self.logger.critical(err)
             return None
@@ -192,7 +192,7 @@ class TTCSubwayScraper( object ):
         request_id = cursor.fetchone()[0]
         self.con.commit()
         cursor.close()
-        self.logger.debug("Request " + str(request_id) + ": " + str(request_row))
+        self.logger.debug("Request " + str(request_id) + ": " + str(request_row) )
 
         return request_id
 
@@ -201,8 +201,8 @@ class TTCSubwayScraper( object ):
 
         for record in ntas_data:
             if self.filter_flag and record['trainMessage'] == "Arriving":
-                continue  # skip any records that are Arriving or not final
-            record_row = {}
+                continue  #skip any records that are Arriving or not final
+            record_row ={}
             record_row['requestid'] = request_id
             record_row['id'] = record['id']
             record_row['station_char'] = record['stationId']
@@ -224,21 +224,21 @@ class TTCSubwayScraper( object ):
         poll_id = cursor.fetchone()[0]
         self.con.commit()
         cursor.close()
-        self.logger.debug("Poll " + str(poll_id) + " started at " + str(time))
+        self.logger.debug("Poll " + str(poll_id) + " started at " + str(time) )
         return poll_id
 
     def update_poll_end(self, poll_id, time):
         cursor = self.con.cursor()
-        cursor.execute(self.poll_update_sql, (str(time), str(poll_id)))
+        cursor.execute(self.poll_update_sql, (str(time), str(poll_id)) )
         self.con.commit()
         cursor.close()
         self.logger.debug("Poll " + str(poll_id) + " ended at " + str(time))
 
-    def check_for_missing_data(self, stationid, lineid, data):
+    def check_for_missing_data( self, stationid, lineid, data):
         if data is None:
             return True
-        ntas_data = data.get('ntasData')
-        if ntas_data is None or ntas_data == []:
+        ntasData = data.get('ntasData')
+        if ntasData is None or ntasData ==[] :
             return True
 
         # there is data, so do more careful checks
@@ -251,8 +251,8 @@ class TTCSubwayScraper( object ):
         # most general way to detect the problem is to check subwayLine field
         linecodes = ("YUS", "BD", "", "SHEP")
         # look for one train observed in the right direction
-        for record in ntas_data:
-            if record['subwayLine'] == linecodes[lineid - 1]:
+        for record in ntasData:
+            if record['subwayLine'] == linecodes[lineid-1]:
                 return False
 
         # none match
@@ -260,30 +260,30 @@ class TTCSubwayScraper( object ):
 
     async def query_station_async(self, session, line_id, station_id):
         retries = 4
-        payload = {"subwayLine": line_id,
-                   "stationId": station_id,
-                   "searchCriteria": ''}
+        payload = {"subwayLine":line_id,
+                   "stationId":station_id,
+                   "searchCriteria":''}
         for attempt in range(retries):
-            # with async_timeout.timeout(10):
+            #with async_timeout.timeout(10):
             try:
                 rtime = datetime.now()
                 async with session.get(self.BASE_URL, params=payload, timeout=5) as resp:
-                    # data = None
+                    #data = None
                     try:
                         data = await resp.json()
                     except ValueError as err:
                         self.logger.error('Malformed JSON for station {} on line {}'.format(station_id, line_id))
                         self.logger.error(err)
                         self.logger.error(resp.text())
-                        if attempt < retries - 1:
+                        if attempt < retries-1:
                             self.logger.debug("Sleeping 2s  ...")
                             await asyncio.sleep(2)
                         continue
 
                     if self.check_for_missing_data(station_id, line_id, data):
                         self.logger.debug("Missing data!")
-                        self.logger.debug("Try " + str(attempt + 1) + " for station " + str(station_id) + " failed.")
-                        if attempt < retries - 1:
+                        self.logger.debug("Try " + str(attempt+1) + " for station " + str(station_id) + " failed.")
+                        if attempt < retries-1:
                             self.logger.debug("Sleeping 2s  ...")
                             await asyncio.sleep(2)
                         continue
@@ -291,8 +291,8 @@ class TTCSubwayScraper( object ):
             except Exception as err:
                 self.logger.critical(err)
                 self.logger.debug("request error!")
-                self.logger.debug("Try " + str(attempt + 1) + " for station " + str(station_id) + " failed.")
-                if attempt < retries - 1:
+                self.logger.debug("Try " + str(attempt+1) + " for station " + str(station_id) + " failed.")
+                if attempt < retries-1:
                     self.logger.debug("Sleeping 2s  ...")
                     await asyncio.sleep(2)
                 continue
@@ -319,7 +319,7 @@ class TTCSubwayScraper( object ):
     #                 self.logger.debug( errmsg.format(line=1, station=1) )
     #             print( responses[0])
 
-    async def query_all_stations_async(self, loop):
+    async def query_all_stations_async(self,loop):
             poll_id = self.insert_poll_start(datetime.now())
 
             # run requests simultaneously using asyncio
