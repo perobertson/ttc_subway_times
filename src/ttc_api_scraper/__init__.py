@@ -34,17 +34,17 @@ LOGGER = logging.getLogger(__name__)
 class DBArchiver (object):
 
     SQLS = {'polls': sql.SQL('''COPY(SELECT * FROM public.polls
-                                 WHERE poll_start >= {0}::DATE AND poll_start < {1}::DATE + INTERVAL '1 month')
-                            TO STDOUT WITH CSV HEADER'''),
-            'requests': sql.SQL('''COPY (SELECT r.* FROM public.requests r
-                                     NATURAL JOIN public.polls
-                                     WHERE poll_start >= {0}::DATE AND poll_start < {1}::DATE + INTERVAL '1 month')
-                               TO STDOUT WITH CSV HEADER'''),
-            'ntas_data': sql.SQL('''COPY (SELECT n.* FROM public.ntas_data n
-                                      NATURAL JOIN public.requests
-                                      NATURAL JOIN public.polls
-                                      WHERE poll_start >= {}::DATE AND poll_start < {}::DATE + INTERVAL '1 month')
-                                TO STDOUT WITH CSV HEADER''')
+                                    WHERE poll_start >= {0}::DATE AND poll_start < {1}::DATE + INTERVAL '1 month')
+                                TO STDOUT WITH CSV HEADER'''),
+            'requests' : sql.SQL('''COPY (SELECT r.* FROM public.requests r
+                                          NATURAL JOIN public.polls
+                                          WHERE poll_start >= {0}::DATE AND poll_start < {1}::DATE + INTERVAL '1 month')
+                                    TO STDOUT WITH CSV HEADER'''),
+            'ntas_data' : sql.SQL('''COPY (SELECT n.* FROM public.ntas_data n
+                                        NATURAL JOIN public.requests
+                                        NATURAL JOIN public.polls
+                                        WHERE poll_start >= {}::DATE AND poll_start < {}::DATE + INTERVAL '1 month')
+                                     TO STDOUT WITH CSV HEADER''')
     }
 
     def __init__(self, con, logger=None):
