@@ -15,14 +15,14 @@ We're still trying to process the predicted arrival times we get from the API in
 Have a look in the [`doc/`](doc/) folder for Jupyter Notebooks explaining how we explored developing this project and understanding the data.
 
 ### Data Flow and Data Structure
-The scraper runs every minute when the TTC is in service. Each of these runs is logged in `polls`, with a unique `pollid` and a start and end time. 
-During one run of the scraper, each station gets its predicted arrivals requested. This is logged in `requests`, with a unique `requestid` and noting which station it is using `stationid` and `lineid`. 
+The scraper runs every minute when the TTC is in service. Each of these runs is logged in `polls`, with a unique `pollid` and a start and end time.
+During one run of the scraper, each station gets its predicted arrivals requested. This is logged in `requests`, with a unique `requestid` and noting which station it is using `stationid` and `lineid`.
 For each request, 3 predicted arrivals are recorded for each line and direction at that station. This is stored in `ntas_data` (Next Train Arrival System). This table notes the train's `traindirection` and its unique id `trainid`, the time until the train's arrival `timint` and a `train_message`, whether the train is arriving, at station, or is delayed.
 **For more info:** have a look at the API exploration notebook under [`doc/API_exploration.ipynb`](https://github.com/CivicTechTO/ttc_subway_times/blob/master/doc/API_exploration.ipynb)
 
 ## Analysing the Data
 
-If you don't want to set up the scraper yourself, and you want to look at historical data: read on! The data is currently stored in a PostgreSQL database on Amazon Relational Database Service (RDS). Have a look at [**How to Get Involved**](#how-to-get-involved) to find out how to get access to the data. 
+If you don't want to set up the scraper yourself, and you want to look at historical data: read on! The data is currently stored in a PostgreSQL database on Amazon Relational Database Service (RDS). Have a look at [**How to Get Involved**](#how-to-get-involved) to find out how to get access to the data.
 
 Archives are provided in two formats: a `csv` for each of the three tables and a PostgreSQL database dump file. If you want to use R or Python to play with the data, you should be fine with the `csv` files, but if you want to play with the data in SQL, read on.
 
@@ -39,7 +39,7 @@ And then to restore:
 ```shell
 pg_restore -d ttc -c -O --if-exists --no-privileges datadump
 ```
-Some notes on [restore](https://devdocs.io/postgresql~9.6/app-pgrestore):  
+Some notes on [restore](https://devdocs.io/postgresql~9.6/app-pgrestore):
  - `-d` specifies the database. Since I'm using a database local to my computer, and I have a db username that shares my computer username, I don't need other authentication parameters. Your Mileage May Vary.
  - `-O` doesn't change owner of objects, so everything should be created as the user you connect to your database with
  - `-c` deletes and creates the tables again. If you already have data in your database, you may want to use the `-a` flag to specify data only, you may also want to specify `--inserts` which will insert each row separately. It's slow but it will prevent the entire restore from failing if you have a duplicate row.
@@ -51,6 +51,19 @@ Some notes on [restore](https://devdocs.io/postgresql~9.6/app-pgrestore):
 
 **Note: You don't need to set up the scraper to analyze the data, but if you want to improve the scraper go ahead.**
 
+<details><summary>Running inside docker</summary>
+Follow the instructions [here](https://docs.docker.com/compose/install/) to get `docker-compose`.
+
+All you need to do is `docker-compose run --rm scraper`.
+This will setup a database container, initialize the tables, and then run the initial scrape.
+
+To have cli access to the data you can use `docker-compose exec db psql -U postgres -d ttc`.
+Commands of interest:
+- `\?`: list the help information for all the special commands
+- `\h`: list all the sql commands that are available
+- `\q`: quit the console
+</details>
+
 Set up a python3 environment and install requirements with the below command. If you want to modify the Jupyter notebooks to explore the data remove the `#` symbols below `# if using jupyter notebooks`
 ```shell
 pip install -r requirements.txt
@@ -61,7 +74,7 @@ We're using [this library](https://aiohttp.readthedocs.io/en/stable/) to improve
 
 ### Database setup
 
-The database engine used to store the data is PostgreSQL, you can find instructions to get the latest and greatest version [here](https://www.postgresql.org/). After you've set up your database you can run the contents of `create_tables.sql` in a pgAdmin query window (or run it as a sql query). 
+The database engine used to store the data is PostgreSQL, you can find instructions to get the latest and greatest version [here](https://www.postgresql.org/). After you've set up your database you can run the contents of `create_tables.sql` in a pgAdmin query window (or run it as a sql query).
 
 #### Edit `db.cfg`
 
@@ -73,37 +86,57 @@ user=yourusername
 password=pw
 ```
 
-
 ### Automating the scraper runs
+First you need to install the scraper on the machine that you want to run it on. This is done with `python setup.py install`. You can append `--help` to find more install options and configuration. This will install the scraper along with its dependencies needed to run. To uninstall it you can use `pip uninstall ttc-api-scraper`.
 
-The scraper runs with a `python ttc_scraper_api.py` command. It doesn't have any command line options (at the moment). We've been running this from 6AM to 1AM
+Once installed you will be able to run the scraper directly from the terminal with `ttc_api_scraper`. If you get a `command not found` error, you will need to make sure that the python binaries are on your `PATH`. When the install command ran, it would have printed a line like `Installing ttc_api_scraper script to ~/.pyenv/versions/3.6.6/bin`. This is the location that needs to be added to your `PATH`.
+
+Alternatively, you can install the required dependencies with `pip install -r requirements.txt` and then run `python src/ttc_api_scraper/__init__.py`
+
+Try appending `--help` to the script to see the current commands and options that are supported.
+
+<details><summary>Current commands and options</summary>
+```
+Usage: ttc_api_scraper [OPTIONS] COMMAND [ARGS]...
+
+Options:
+  -d, --settings PATH
+  --help               Show this message and exit.
+
+Commands:
+  archive  Download month (YYYYMM) of data from database...
+  scrape   Run the scraper.
+```
+</details>
+
+We've been running this from 6AM to 1AM.
 
 #### Linux/Unix
 If you use Mac or Linux, add the below to cron. Don't forget to change `/path/to/ttc_api_scraper.py`
 
 ```shell
 # m h  dom mon dow   command
-* 5-23 * * 1-5 cd /path/to/repo/ttc_subway_times/ && bin/python3 ttc_api_scraper.py
-* 0-1 * * 1-5 cd /path/to/repo/ttc_subway_times/ && bin/python3 ttc_api_scraper.py
-* 5-23 * * 6-7 cd /path/to/repo/ttc_subway_times/ && bin/python3 ttc_api_scraper.py
-* 0-2 * * 6-7 cd /path/to/repo/ttc_subway_times/ && bin/python3 ttc_api_scraper.py
+* 5-23 * * 1-5 cd /path/to/repo/ttc_subway_times/ && bin/python3 src/ttc_api_scraper/__init__.py scrape
+* 0-1 * * 1-5 cd /path/to/repo/ttc_subway_times/ && bin/python3 src/ttc_api_scraper/__init__.py scrape
+* 5-23 * * 6-7 cd /path/to/repo/ttc_subway_times/ && bin/python3 src/ttc_api_scraper/__init__.py scrape
+* 0-2 * * 6-7 cd /path/to/repo/ttc_subway_times/ && bin/python3 src/ttc_api_scraper/__init__.py scrape
 ```
 Or if you want to run every 20s while filtering out any "arriving" records
 
 ```shell
 
-* 5-23 * * 1-5 cd ~/git/ttc_subway_times && bin/python3 ttc_api_scraper.py --filter --schemaname filtered
-* 0-1 * * 1-5 cd ~/git/ttc_subway_times && bin/python3 ttc_api_scraper.py --filter --schemaname filtered
-* 5-23 * * 6-7 cd ~/git/ttc_subway_times && bin/python3 ttc_api_scraper.py --filter --schemaname filtered
-* 0-2 * * 6-7 cd ~/git/ttc_subway_times && bin/python3 ttc_api_scraper.py --filter --schemaname filtered
-* 5-23 * * 1-5 (sleep 20; cd ~/git/ttc_subway_times && bin/python3 ttc_api_scraper.py --filter --schemaname filtered)
-* 0-1 * * 1-5 (sleep 20; cd ~/git/ttc_subway_times && bin/python3 ttc_api_scraper.py --filter --schemaname filtered)
-* 5-23 * * 6-7 (sleep 20; cd ~/git/ttc_subway_times && bin/python3 ttc_api_scraper.py --filter --schemaname filtered)
-* 0-2 * * 6-7 (sleep 20; cd ~/git/ttc_subway_times && bin/python3 ttc_api_scraper.py --filter --schemaname filtered)
-* 5-23 * * 1-5 (sleep 40; cd ~/git/ttc_subway_times && bin/python3 ttc_api_scraper.py --filter --schemaname filtered)
-* 0-1 * * 1-5 (sleep 40; cd ~/git/ttc_subway_times && bin/python3 ttc_api_scraper.py --filter --schemaname filtered)
-* 5-23 * * 6-7 (sleep 40; cd ~/git/ttc_subway_times && bin/python3 ttc_api_scraper.py --filter --schemaname filtered)
-* 0-2 * * 6-7 (sleep 40; cd ~/git/ttc_subway_times && bin/python3 ttc_api_scraper.py --filter --schemaname filtered)
+* 5-23 * * 1-5 cd ~/git/ttc_subway_times && bin/python3 src/ttc_api_scraper/__init__.py scrape --filter --schemaname filtered
+* 0-1 * * 1-5 cd ~/git/ttc_subway_times && bin/python3 src/ttc_api_scraper/__init__.py scrape --filter --schemaname filtered
+* 5-23 * * 6-7 cd ~/git/ttc_subway_times && bin/python3 src/ttc_api_scraper/__init__.py scrape --filter --schemaname filtered
+* 0-2 * * 6-7 cd ~/git/ttc_subway_times && bin/python3 src/ttc_api_scraper/__init__.py scrape --filter --schemaname filtered
+* 5-23 * * 1-5 (sleep 20; cd ~/git/ttc_subway_times && bin/python3 src/ttc_api_scraper/__init__.py scrape --filter --schemaname filtered)
+* 0-1 * * 1-5 (sleep 20; cd ~/git/ttc_subway_times && bin/python3 src/ttc_api_scraper/__init__.py scrape --filter --schemaname filtered)
+* 5-23 * * 6-7 (sleep 20; cd ~/git/ttc_subway_times && bin/python3 src/ttc_api_scraper/__init__.py scrape --filter --schemaname filtered)
+* 0-2 * * 6-7 (sleep 20; cd ~/git/ttc_subway_times && bin/python3 src/ttc_api_scraper/__init__.py scrape --filter --schemaname filtered)
+* 5-23 * * 1-5 (sleep 40; cd ~/git/ttc_subway_times && bin/python3 src/ttc_api_scraper/__init__.py scrape --filter --schemaname filtered)
+* 0-1 * * 1-5 (sleep 40; cd ~/git/ttc_subway_times && bin/python3 src/ttc_api_scraper/__init__.py scrape --filter --schemaname filtered)
+* 5-23 * * 6-7 (sleep 40; cd ~/git/ttc_subway_times && bin/python3 src/ttc_api_scraper/__init__.py scrape --filter --schemaname filtered)
+* 0-2 * * 6-7 (sleep 40; cd ~/git/ttc_subway_times && bin/python3 src/ttc_api_scraper/__init__.py scrape --filter --schemaname filtered)
 ```
 
 #### Windows users
@@ -111,7 +144,7 @@ Or if you want to run every 20s while filtering out any "arriving" records
 Use Task Scheduler.
 
 #### cronic.py
-If the above sounds complicated, here's a simple looping script that calls `ttc_api_scraper.py` every minute during the TTC's operating hours. Just start it in your command line with  
+If the above sounds complicated, here's a simple looping script that calls `ttc_api_scraper.py` every minute during the TTC's operating hours. Just start it in your command line with
 ```shell
 python cronic.py
 ```
