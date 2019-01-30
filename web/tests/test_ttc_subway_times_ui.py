@@ -1,0 +1,5 @@
+from ttc_subway_times_ui import __version__
+
+
+def test_version():
+    assert __version__ == '0.1.0'
