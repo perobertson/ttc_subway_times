@@ -8,3 +8,11 @@ pip install poetry
 hash -r
 poetry install
 ```
+
+Create a `.env` file with these contents for easy loading of the app.
+```
+FLASK_APP=ttc_subway_times_ui
+FLASK_ENV=development
+```
+
+Run the app with `flask run`

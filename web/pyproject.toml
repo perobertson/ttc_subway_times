@@ -6,9 +6,11 @@ authors = ["Paul Robertson <t.paulrobertson@gmail.com>"]
 
 [tool.poetry.dependencies]
 python = "^3.7"
+flask = "^1.0"
 
 [tool.poetry.dev-dependencies]
 pytest = "^3.0"
+python-dotenv = "^0.10.1"
 
 [build-system]
 requires = ["poetry>=0.12"]
