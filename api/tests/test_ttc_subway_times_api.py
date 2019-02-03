@@ -1,4 +1,4 @@
-from ttc_subway_times_ui import __version__
+from ttc_subway_times_api import __version__
 
 
 def test_version():

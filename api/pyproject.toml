@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "ttc-subway-times-ui"
+name = "ttc-subway-times-api"
 version = "0.1.0"
 description = ""
 authors = ["Paul Robertson <t.paulrobertson@gmail.com>"]
